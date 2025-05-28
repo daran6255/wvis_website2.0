@@ -22,9 +22,57 @@ import useCustomToast from "../../hooks/useCustomToast";
 import DB_Navbar from "../../components/common/DB_Navbar";
 import BlogTable from "../../components/admin/blog_table";
 
-// Tiptap imports
+// TipTap imports
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import TextStyle from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
+import { Editor } from "@tiptap/core";
+
+const MenuBar = ({ editor }: { editor: Editor | null }) => {
+  if (!editor) return null;
+
+  return (
+    <Flex gap={2} mb={2} flexWrap="wrap" alignItems="center">
+      <Button size="sm" onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive("bold")}>
+        Bold
+      </Button>
+      <Button size="sm" onClick={() => editor.chain().focus().toggleItalic().run()} isActive={editor.isActive("italic")}>
+        Italic
+      </Button>
+      <Button size="sm" onClick={() => editor.chain().focus().toggleUnderline().run()} isActive={editor.isActive("underline")}>
+        Underline
+      </Button>
+      <Button size="sm" onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive("bulletList")}>
+        Bullet List
+      </Button>
+      <Button size="sm" onClick={() => editor.chain().focus().toggleOrderedList().run()} isActive={editor.isActive("orderedList")}>
+        Numbered List
+      </Button>
+      <Button size="sm" onClick={() => editor.chain().focus().setParagraph().run()}>
+        Paragraph
+      </Button>
+      <Button size="sm" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} isActive={editor.isActive("heading", { level: 1 })}>
+        H1
+      </Button>
+      <Button size="sm" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} isActive={editor.isActive("heading", { level: 2 })}>
+        H2
+      </Button>
+
+      {/* Font Color Picker */}
+      <input
+        type="color"
+        title="Font Color"
+        onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+        style={{ width: 32, height: 32, border: "none", cursor: "pointer" }}
+      />
+      <Button size="sm" onClick={() => editor.chain().focus().unsetColor().run()}>
+        Reset Color
+      </Button>
+    </Flex>
+  );
+};
 
 const AdminBlogForm = () => {
   const showToast = useCustomToast();
@@ -105,7 +153,7 @@ const AdminBlogForm = () => {
   };
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [StarterKit, Underline, TextStyle, Color],
     content: formData.description,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
@@ -149,6 +197,7 @@ const AdminBlogForm = () => {
                   <FormControl isRequired>
                     <FormLabel>Description</FormLabel>
                     <Box border="1px solid #CBD5E0" borderRadius="md" p={2} bg="white" minH="200px">
+                      <MenuBar editor={editor} />
                       <EditorContent editor={editor} />
                     </Box>
                   </FormControl>
