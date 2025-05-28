@@ -1,0 +1,9 @@
+# Core Libraries
+flask
+flask-SQLAlchemy
+flask-cors
+flask-migrate
+flask-jwt-extended
+python-dotenv
+psycopg2-binary
+

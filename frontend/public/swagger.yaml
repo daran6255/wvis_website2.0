@@ -1,0 +1,145 @@
+openapi: 3.0.0
+info:
+  title: User Authentication API
+  description: API for user login, signup, token verification, and logout.
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:5000
+paths:
+  /auth/login:
+    post:
+      summary: Login API call
+      description: Login user and return an authentication token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: User's email address
+                password:
+                  type: string
+                  description: User's password
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  token:
+                    type: string
+        '400':
+          description: Invalid email or password
+        '500':
+          description: Internal server error
+
+  /auth/signup:
+    post:
+      summary: Signup API call
+      description: Register a new user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: User's full name
+                username:
+                  type: string
+                  description: User's unique username
+                email:
+                  type: string
+                  description: User's email address
+                password:
+                  type: string
+                  description: User's password
+              required:
+                - name
+                - username
+                - email
+                - password
+      responses:
+        '201':
+          description: Successfully signed up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          description: Bad request, invalid data
+        '500':
+          description: Internal server error
+
+  /auth/logout:
+    post:
+      summary: Logout API call
+      description: Logs out the user and invalidates the token.
+      responses:
+        '200':
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+        '500':
+          description: Internal server error
+
+  /auth/verify-token:
+    get:
+      summary: Verify Token API call
+      description: Verifies the validity of the user's authentication token.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully verified token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      email:
+                        type: string
+                  status:
+                    type: string
+                  message:
+                    type: string
+        '401':
+          description: Unauthorized, token not found or invalid
+        '500':
+          description: Internal server error
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
