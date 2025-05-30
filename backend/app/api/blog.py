@@ -85,11 +85,25 @@ def get_blog(blog_id):
 
 
 # DELETE: Delete a blog by ID
-@blp.route("/<uuid:blog_id>", methods=["DELETE"])
+@blp.route("/delete/<uuid:blog_id>", methods=["DELETE"])
 def delete_blog(blog_id):
     blog = Blog.query.get(blog_id)
     if not blog:
         return jsonify({"error": "Blog not found"}), 404
+
+    # Construct image file path from the stored image filename
+    image_path = os.path.join(current_app.static_folder, "images", blog.image)
+    
+    # Delete the image file if it exists
+    if os.path.exists(image_path):
+        try:
+            os.remove(image_path)
+        except Exception as e:
+            current_app.logger.warning(f"Failed to delete image: {image_path}. Error: {e}")
+
+    # Delete the blog entry from the database
     db.session.delete(blog)
     db.session.commit()
-    return jsonify({"message": "Blog deleted"})
+
+    return jsonify({"message": "Blog and image deleted"})
+

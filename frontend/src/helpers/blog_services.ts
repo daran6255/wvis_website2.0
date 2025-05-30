@@ -9,6 +9,7 @@ import {
 // Base API path for blogs
 const API_BASE_URL =
     import.meta.env.MODE === 'development'
+        // ? 'http://localhost:5173'
         ? 'https://winvinaya.com'
         : ''; // Empty string works with Nginx in production
 
@@ -62,6 +63,6 @@ export const postBlog = async (data: BlogPostData): Promise<BlogPostResponse> =>
  * Delete a blog by UUID
  */
 export const deleteBlog = async (blogId: string): Promise<{ message: string }> => {
-  const response = await axios.delete<{ message: string }>(`${API_BASE}/${blogId}`);
+  const response = await axios.delete<{ message: string }>(`${API_BASE}/delete/${blogId}`);
   return response.data;
 };

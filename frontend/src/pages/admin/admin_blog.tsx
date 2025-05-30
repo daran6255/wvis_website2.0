@@ -13,6 +13,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  FormHelperText,
   Flex,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -229,9 +230,10 @@ const AdminBlogForm = () => {
                     <Input
                       type="file"
                       name="image"
-                      accept="image/*"
+                      accept=".jpg,.jpeg,.png"
                       onChange={handleFileChange}
                     />
+                    <FormHelperText>Accepted types: .jpg, .jpeg, .png</FormHelperText>
                   </FormControl>
                 </VStack>
               </ModalBody>
@@ -253,7 +255,6 @@ const AdminBlogForm = () => {
           </ModalContent>
         </Modal>
       </Box>
-
       <BlogTable />
     </>
   );

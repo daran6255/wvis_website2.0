@@ -3,6 +3,7 @@ import {
   Button,
   FormControl,
   FormLabel,
+  FormHelperText,
   Input,
   Textarea,
   VStack,
@@ -22,6 +23,8 @@ import { NewsletterPostData } from "../../helpers/model";
 import useCustomToast from "../../hooks/useCustomToast";
 import DB_Navbar from "../../components/common/DB_Navbar";
 import NewsletterTable from "../../components/admin/newsletter_table";
+
+const MAX_PDF_SIZE_MB = 2;
 
 const AdminNewsletterForm = () => {
   const showToast = useCustomToast();
@@ -45,9 +48,27 @@ const AdminNewsletterForm = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
-    if (files && files.length > 0) {
-      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+
+    if (name === "image") {
+      const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+      if (!validImageTypes.includes(file.type)) {
+        showToast("Invalid file type", "Only JPG, JPEG, or PNG images are allowed.", "error");
+        return;
+      }
     }
+
+    if (name === "pdf") {
+      const maxSizeBytes = MAX_PDF_SIZE_MB * 1024 * 1024;
+      if (file.size > maxSizeBytes) {
+        showToast("File too large", `PDF size must be less than ${MAX_PDF_SIZE_MB} MB.`, "error");
+        return;
+      }
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: file }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,9 +89,10 @@ const AdminNewsletterForm = () => {
         pdf: undefined,
       });
       onClose();
-    } catch (error) {
-      showToast("Error", "Failed to create newsletter.", "error");
-    } finally {
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : "Unknown error";
+    showToast("Error", `Failed to create newsletter. ${errMsg}`, "error");
+  }finally {
       setLoading(false);
     }
   };
@@ -120,9 +142,10 @@ const AdminNewsletterForm = () => {
                     <Input
                       type="file"
                       name="image"
-                      accept="image/*"
+                      accept=".jpg,.jpeg,.png"
                       onChange={handleFileChange}
                     />
+                    <FormHelperText>Accepted types: .jpg, .jpeg, .png</FormHelperText>
                   </FormControl>
 
                   <FormControl isRequired>
@@ -133,6 +156,7 @@ const AdminNewsletterForm = () => {
                       accept=".pdf"
                       onChange={handleFileChange}
                     />
+                    <FormHelperText>PDF file size limit: 2MB</FormHelperText>
                   </FormControl>
                 </VStack>
               </ModalBody>
@@ -154,7 +178,7 @@ const AdminNewsletterForm = () => {
           </ModalContent>
         </Modal>
       </Box>
-	  <NewsletterTable />
+      <NewsletterTable />
     </>
   );
 };
