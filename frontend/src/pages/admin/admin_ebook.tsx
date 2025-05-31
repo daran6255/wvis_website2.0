@@ -25,7 +25,7 @@ import useCustomToast from "../../hooks/useCustomToast";
 import DB_Navbar from "../../components/common/DB_Navbar";
 import EbookTable from "../../components/admin/ebook_table";
 
-const MAX_FILE_SIZE_MB = 10;
+const MAX_FILE_SIZE_MB = 100;
 
 const AdminEbookForm = () => {
   const showToast = useCustomToast();
