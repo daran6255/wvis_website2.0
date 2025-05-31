@@ -3,7 +3,7 @@ import {
   Container,
   Heading,
   Text,
-  Image,
+  // Image,
   Stack,
   Tag,
   Spinner,
@@ -85,7 +85,7 @@ export default function BlogDetails() {
                     zIndex: 0,
                   }}
                 >
-                  <Image
+                  {/* <Image
                     src={blog.image}
                     alt={blog.title}
                     w="100%"
@@ -97,7 +97,7 @@ export default function BlogDetails() {
                     borderRadius="md"
                     transition="transform 0.4s ease"
                     _hover={{ transform: 'scale(1.05)' }}
-                  />
+                  /> */}
                 </Box>
 
                 <Heading

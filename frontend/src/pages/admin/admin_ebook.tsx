@@ -1,3 +1,4 @@
+// Imports remain the same
 import {
   Box,
   Button,
@@ -15,27 +16,27 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Flex
+  Flex,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { postNewsletter } from "../../helpers/newsletter_service";
-import { NewsletterPostData } from "../../helpers/model";
+import { postEbook } from "../../helpers/ebook_services";
+import { EbookPostData } from "../../helpers/model";
 import useCustomToast from "../../hooks/useCustomToast";
 import DB_Navbar from "../../components/common/DB_Navbar";
-import NewsletterTable from "../../components/admin/newsletter_table";
+import EbookTable from "../../components/admin/ebook_table";
 
-const MAX_PDF_SIZE_MB = 2;
-const MAX_DESCRIPTION_LENGTH = 1000;
+const MAX_FILE_SIZE_MB = 10;
 
-const AdminNewsletterForm = () => {
+const AdminEbookForm = () => {
   const showToast = useCustomToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [formData, setFormData] = useState<NewsletterPostData>({
-    title: "",
+  const [formData, setFormData] = useState<EbookPostData>({
+    name: "",
     description: "",
-    image: undefined,
-    pdf: undefined,
+    image_file: undefined,
+    pdf_file: undefined,
+    epub_file: undefined,
   });
 
   const [loading, setLoading] = useState(false);
@@ -52,21 +53,15 @@ const AdminNewsletterForm = () => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
+    const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
 
-    if (name === "image") {
-      const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
-      if (!validImageTypes.includes(file.type)) {
-        showToast("Invalid file type", "Only JPG, JPEG, or PNG images are allowed.", "error");
-        return;
-      }
-    }
-
-    if (name === "pdf") {
-      const maxSizeBytes = MAX_PDF_SIZE_MB * 1024 * 1024;
-      if (file.size > maxSizeBytes) {
-        showToast("File too large", `PDF size must be less than ${MAX_PDF_SIZE_MB} MB.`, "error");
-        return;
-      }
+    if (file.size > maxSizeBytes) {
+      showToast(
+        "File too large",
+        `File size must be less than ${MAX_FILE_SIZE_MB} MB.`,
+        "error"
+      );
+      return;
     }
 
     setFormData((prev) => ({ ...prev, [name]: file }));
@@ -74,25 +69,26 @@ const AdminNewsletterForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.description || !formData.image || !formData.pdf) {
+    if (!formData.name || !formData.description || !formData.pdf_file || !formData.image_file) {
       showToast("Missing fields", "Please fill in all required fields.", "error");
       return;
     }
 
     setLoading(true);
     try {
-      await postNewsletter(formData);
-      showToast("Success", "Newsletter created successfully!", "success");
+      await postEbook(formData);
+      showToast("Success", "Ebook uploaded successfully!", "success");
       setFormData({
-        title: "",
+        name: "",
         description: "",
-        image: undefined,
-        pdf: undefined,
+        image_file: undefined,
+        pdf_file: undefined,
+        epub_file: undefined,
       });
       onClose();
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : "Unknown error";
-      showToast("Error", `Failed to create newsletter. ${errMsg}`, "error");
+      showToast("Error", `Failed to upload ebook. ${errMsg}`, "error");
     } finally {
       setLoading(false);
     }
@@ -105,30 +101,26 @@ const AdminNewsletterForm = () => {
       <Box maxW="6xl" mx="auto" mt={10} p={6}>
         <Flex justify="flex-end">
           <Button colorScheme="teal" onClick={onOpen}>
-            Add Newsletter
+            Add Ebook
           </Button>
         </Flex>
 
-        <Modal isOpen={isOpen} onClose={onClose} size="lg" scrollBehavior="inside">
+        <Modal isOpen={isOpen} onClose={onClose} size="lg">
           <ModalOverlay />
-          <ModalContent
-            maxH="90vh"
-            overflow="hidden"
-            display="flex"
-            flexDirection="column">
-            <ModalHeader>Create Newsletter</ModalHeader>
+          <ModalContent>
+            <ModalHeader>Create Ebook</ModalHeader>
             <ModalCloseButton />
             <form onSubmit={handleSubmit}>
               <ModalBody>
                 <VStack spacing={4} align="stretch">
                   <FormControl isRequired>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>Name</FormLabel>
                     <Input
                       type="text"
-                      name="title"
-                      value={formData.title}
+                      name="name"
+                      value={formData.name}
                       onChange={handleInputChange}
-                      placeholder="Enter newsletter title"
+                      placeholder="Enter ebook name"
                     />
                   </FormControl>
 
@@ -137,39 +129,42 @@ const AdminNewsletterForm = () => {
                     <Textarea
                       name="description"
                       value={formData.description}
-                      onChange={(e) => {
-                        if (e.target.value.length <= MAX_DESCRIPTION_LENGTH) {
-                          handleInputChange(e);
-                        }
-                      }}
-                      placeholder="Enter newsletter description"
-                      resize="vertical"
+                      onChange={handleInputChange}
+                      placeholder="Enter ebook description"
                     />
-                    <FormHelperText>
-                      {formData.description.length} / {MAX_DESCRIPTION_LENGTH} characters
-                    </FormHelperText>
                   </FormControl>
 
                   <FormControl isRequired>
-                    <FormLabel>Upload Image</FormLabel>
+                    <FormLabel>Upload Cover Image</FormLabel>
                     <Input
                       type="file"
-                      name="image"
-                      accept=".jpg,.jpeg,.png"
+                      name="image_file"
+                      accept="image/*"
                       onChange={handleFileChange}
                     />
-                    <FormHelperText>Accepted types: .jpg, .jpeg, .png</FormHelperText>
+                    <FormHelperText>Accepts JPG, PNG (max 10MB)</FormHelperText>
                   </FormControl>
 
                   <FormControl isRequired>
                     <FormLabel>Upload PDF</FormLabel>
                     <Input
                       type="file"
-                      name="pdf"
+                      name="pdf_file"
                       accept=".pdf"
                       onChange={handleFileChange}
                     />
-                    <FormHelperText>PDF file size limit: 2MB</FormHelperText>
+                    <FormHelperText>PDF file size limit: 10MB</FormHelperText>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>Upload EPUB (optional)</FormLabel>
+                    <Input
+                      type="file"
+                      name="epub_file"
+                      accept=".epub"
+                      onChange={handleFileChange}
+                    />
+                    <FormHelperText>EPUB file size limit: 10MB</FormHelperText>
                   </FormControl>
                 </VStack>
               </ModalBody>
@@ -191,9 +186,10 @@ const AdminNewsletterForm = () => {
           </ModalContent>
         </Modal>
       </Box>
-      <NewsletterTable />
+
+      <EbookTable />
     </>
   );
 };
 
-export default AdminNewsletterForm;
+export default AdminEbookForm;

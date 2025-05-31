@@ -6,4 +6,4 @@ flask-migrate
 flask-jwt-extended
 python-dotenv
 psycopg2-binary
-
+PyPDF2

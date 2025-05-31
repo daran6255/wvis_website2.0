@@ -36,6 +36,7 @@ const Navbar = () => {
     { label: 'About', to: '/about' },
     { label: 'Newsletters', to: '/newsletters' },
     { label: 'Blogs', to: '/blogs' },
+    { label: 'Ebooks', to: '/ebooks' },
   ]
 
   const socialLinks = [

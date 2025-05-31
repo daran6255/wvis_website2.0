@@ -35,6 +35,7 @@ const DB_Navbar: React.FC = () => {
         <HStack spacing={4}>
           <Link href="/a/newsletter" fontWeight="medium">Newsletter</Link>
           <Link href="/a/blog" fontWeight="medium">Blog</Link>
+          <Link href="/a/ebook" fontWeight="medium">E-Book</Link>
           <Button colorScheme="teal" onClick={handleLogout}>
             Logout
           </Button>

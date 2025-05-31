@@ -2,109 +2,101 @@
 // User Interface (from backend structure)
 // ---------------------------------------
 export interface User {
-    id: string;
-    email: string;
+  id: string;
+  email: string;
 }
 
 // ---------------------------------------
 // Signup / Login
 // ---------------------------------------
 export interface SignupData {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface LoginData {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface LoginResponse {
-    status: string;
-    token: string;
-    result: {
-        id: string;
-        email: string;
-    };
+  status: string;
+  token: string;
+  result: {
+    id: string;
+    email: string;
+  };
 }
 
 export interface SignupResponse {
-    status: string;
-    result?: {
-        id: string;
-        email: string;
-    };
-    message?: string;
+  status: string;
+  result?: {
+    id: string;
+    email: string;
+  };
+  message?: string;
 }
 
 export interface LogoutResponse {
-    msg: string;
+  msg: string;
 }
 
 export interface VerifyTokenResponse {
-    status: string;
-    message: string;
-    result: {
-        id: string;
-        email: string;
-    } | null;
+  status: string;
+  message: string;
+  result: {
+    id: string;
+    email: string;
+  } | null;
 }
 
 // ---------------------------------------
 // Newsletter Interfaces
 // ---------------------------------------
-    export interface Newsletter {
-    id: string;
-    title: string;
-    image: string;
-    link: string;
-    description: string;
-    }
+export interface Newsletter {
+  id: string;
+  title: string;
+  image: string;
+  link: string;
+  description: string;
+}
 
-  
-  // FormData format when sending POST request with files
-  export interface NewsletterPostData {
-    title: string;
-    description: string;
-    image?: File; // image file (optional during edit)
-    pdf?: File;   // pdf file (optional during edit)
-  }
-  
-  // Response from GET /api/newsletters/getall
-  export type NewsletterListResponse = Newsletter[];
-  
-  // Response from POST /api/newsletters/postnewsletter
-  export interface NewsletterPostResponse {
-    message: string;
-  }
-  
+export interface NewsletterPostData {
+  title: string;
+  description: string;
+  image?: File;
+  pdf?: File;
+}
+
+export type NewsletterListResponse = Newsletter[];
+
+export interface NewsletterPostResponse {
+  message: string;
+}
+
 // ---------------------------------------
 // Blog Interfaces
 // ---------------------------------------
-
 export interface Blog {
   id: string;
   title: string;
-  image: string;     // URL to image
-  tags: string[];     // List of tags
-  description: string; // Markdown or plain text content
+  image: string;
+  tags: string[];
+  description: string;
   author: string;
-  created_at: string; // ISO date string
+  created_at: string;
 }
 
-// FormData format when sending POST request with image file
 export interface BlogPostData {
   title: string;
   description: string;
-  tags: string[];      // array of tags
+  tags: string[];
   author: string;
-  image?: File;        // Optional image file (for create/edit)
+  image?: File;
 }
 
-// Response from GET /api/blogs
 export type BlogListResponse = Blog[];
 
-// Response from POST /api/blogs
 export interface BlogPostResponse {
   message: string;
   blog: {
@@ -113,8 +105,39 @@ export interface BlogPostResponse {
     description: string;
     author: string;
     tags: string[];
-    image: string; // This will be a full URL like https://winvinaya.com/static/images/...
+    image: string;
     created_at: string;
   };
 }
 
+// ---------------------------------------
+// Ebook Interfaces
+// ---------------------------------------
+export interface Ebook {
+  id: string;
+  name: string;
+  description: string;
+  image_file: string;
+  pdf_file: string;      // URL to PDF
+  epub_file: string;     // URL to EPUB
+  page_count: number;
+  created_at: string;
+}
+
+// FormData format for POST request
+export interface EbookPostData {
+  name: string;
+  description: string;
+  image_file?: File;  // <-- Allow undefined
+  pdf_file?: File;    // <-- Allow undefined
+  epub_file?: File;   // <-- Optional field
+}
+
+// Response from POST /api/ebooks/postebook
+export interface EbookPostResponse {
+  message: string;
+  ebook: Ebook;
+}
+
+// Response from GET /api/ebooks/getall
+export type EbookListResponse = Ebook[];
