@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 import os
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .database import db
 from .models.users import User
@@ -21,7 +22,7 @@ jwt = JWTManager()  # JWT Manager initialization
 def create_app():
     """Create and configure the Flask app."""
     
-
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     app = Flask(
         __name__,
         static_folder=os.path.join(os.path.dirname(__file__), 'static'),
