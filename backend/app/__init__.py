@@ -13,7 +13,7 @@ from .api.verify_token import blp as verify_token_bp  # Verify token blueprint
 from .api.newsletter import blp as newsletter # Newsletter blueprint
 from .api.static_routes import static_bp # Static routes blueprint
 from .api.blog import blp as blog_bp  # Blog blueprint
-# from .api.ebook import blp as ebook_bp
+from .api.ebook import blp as ebook_bp
 
 jwt = JWTManager()  # JWT Manager initialization
 
@@ -50,6 +50,6 @@ def create_app():
     app.register_blueprint(newsletter) # Newsletter endpoints
     app.register_blueprint(static_bp) # Static routes for serving files
     app.register_blueprint(blog_bp) # Blog endpoints
-    # app.register_blueprint(ebook_bp) # Ebook endpoints
+    app.register_blueprint(ebook_bp) # Ebook endpoints
 
     return app
