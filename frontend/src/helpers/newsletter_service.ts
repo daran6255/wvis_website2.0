@@ -6,13 +6,12 @@ import {
   NewsletterPostResponse,
 } from "./model";
 
-const API_BASE_URL =
-    import.meta.env.MODE === 'development'
-        // ? 'http://localhost:5173'
-        ? 'https://winvinaya.com'
-        : ''; // Empty string works with Nginx in production
+// ✅ Read base URL from .env
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+// ✅ Compose newsletter endpoint
 const API_BASE = `${API_BASE_URL}/api/newsletters`;
+
 
 /**
  * Fetch all newsletters
