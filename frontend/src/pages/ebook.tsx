@@ -26,57 +26,139 @@ import {
   useBreakpointValue,
   Divider,
 } from "@chakra-ui/react";
-import { FaDownload, FaStar, FaRegStar } from "react-icons/fa";
+import { FaDownload, FaStar, FaRegStar, FaBook, FaFileAlt } from "react-icons/fa";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import { useEffect, useState } from "react";
-import { getAllEbooks } from "../helpers/ebook_services";
+import { getAllEbooks, incrementDownloadCount, submitRating } from "../helpers/ebook_services";
 import { Ebook } from "../helpers/model";
 
 type EbookWithCounts = Ebook & {
-  pdfDownloads: number;
-  epubDownloads: number;
-  rating: number;
-  reviewCount: number;
+  pdfDownloads?: number;
+  epubDownloads?: number;
+  rating?: number;
+  reviewCount?: number;
 };
+
+type AnalyticsProps = {
+  analytics: {
+    totalBooks: number;
+    totalPages: number;
+    totalDownloads: number;
+  };
+};
+
+function AnalyticsCards({ analytics }: AnalyticsProps) {
+  return (
+    <Flex
+      maxW="7xl"
+      mx="auto"
+      gap={{ base: 6, md: 12 }}
+      justifyContent="center"
+      flexWrap="wrap"
+      px={{ base: 4, md: 0 }}
+      py={10}
+      aria-label="eBook library analytics"
+    >
+      {[
+        {
+          icon: <FaBook size={36} />,
+          label: "No. of Books",
+          value: analytics.totalBooks,
+          bgGradient: "linear(to-tr, teal.400, blue.500)",
+        },
+        {
+          icon: <FaFileAlt size={36} />,
+          label: "Remediated Pages",
+          value: analytics.totalPages,
+          bgGradient: "linear(to-tr, purple.400, pink.500)",
+        },
+        {
+          icon: <FaDownload size={36} />,
+          label: "No. of Downloads",
+          value: analytics.totalDownloads,
+          bgGradient: "linear(to-tr, orange.400, red.500)",
+        },
+      ].map(({ icon, label, value, bgGradient }, idx) => (
+        <Box
+        key={idx}
+        role="group"
+        cursor="default"
+        bg="white"
+        rounded="3xl"
+        shadow="xl"
+        w={{ base: "full", sm: "280px" }}
+        p={{ base: 6, md: 8 }}
+        transition="transform 0.3s ease, box-shadow 0.3s ease"
+        _hover={{ transform: "translateY(-8px)", shadow: "2xl" }}
+      >
+        {/* Label at the top */}
+        <Text
+          fontSize="md"
+          color="gray.600"
+          mb={4}
+          fontWeight="semibold"
+          letterSpacing="wide"
+          textAlign="center"
+        >
+          {label}
+        </Text>
+
+        {/* Horizontal Row: Icon and Value */}
+        <Flex align="center" justify="center" gap={4}>
+          <Box
+            p={2}
+            rounded="full"
+            bgGradient={bgGradient}
+            color="white"
+            display="inline-flex"
+            alignItems="center"
+            justifyContent="center"
+            boxShadow="md"
+            fontSize="20px" // 👈 smaller icon size
+            transition="transform 0.3s ease"
+            _groupHover={{ transform: "scale(1.2)" }}
+          >
+            {icon}
+          </Box>
+
+          <Text
+            fontSize={{ base: "4xl", md: "5xl" }}
+            fontWeight="extrabold"
+            letterSpacing="wide"
+            color="gray.800"
+            lineHeight="1"
+          >
+            {value}
+          </Text>
+        </Flex>
+      </Box>
+      ))}
+    </Flex>
+  );
+}
 
 const EbookPage = () => {
   const [ebooks, setEbooks] = useState<EbookWithCounts[]>([]);
-  const [reviewInputs, setReviewInputs] = useState<{ [id: string]: { rating: number; comment: string } }>({});
+  const [reviewInputs, setReviewInputs] = useState<{ [id: string]: { rating: number } }>({});
   const [selectedEbook, setSelectedEbook] = useState<EbookWithCounts | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const toast = useToast();
   const cardBg = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.700", "gray.200");
 
-  const localStorageKey = "ebook_downloads_reviews";
-
-  const loadLocalData = () => {
-    const stored = localStorage.getItem(localStorageKey);
-    return stored ? JSON.parse(stored) : {};
-  };
-
-  const saveLocalData = (data: EbookLocalData) => {
-    localStorage.setItem(localStorageKey, JSON.stringify(data));
-  };
   const fetchEbooks = async () => {
     try {
       const data = await getAllEbooks();
-      const localData = loadLocalData();
-
-      const ebooksWithCounts = data.map((ebook: Ebook) => {
-        const saved = localData[ebook.id] || {
-          pdfDownloads: 0,
-          epubDownloads: 0,
-          rating: Math.floor(Math.random() * 5) + 1,
-          reviewCount: Math.floor(Math.random() * 100) + 1,
-        };
-        return { ...ebook, ...saved };
-      });
-
-      setEbooks(ebooksWithCounts);
+      const mapped = data.map((ebook) => ({
+        ...ebook,
+        pdfDownloads: ebook.pdf_downloads ?? 0,
+        epubDownloads: ebook.epub_downloads ?? 0,
+        reviewCount: ebook.review_count ?? 0,
+      }));
+      setEbooks(mapped);
     } catch (error) {
-      console.error("Error fetching ebooks:", error);
+      console.error("Failed to fetch ebooks", error);
       toast({ title: "Failed to fetch ebooks", status: "error", duration: 3000 });
     }
   };
@@ -85,81 +167,50 @@ const EbookPage = () => {
     fetchEbooks();
   }, []);
 
-  const handleDownload = (id: string, type: "pdf" | "epub") => {
-    setEbooks((prev) => {
-      const updated = prev.map((ebook) =>
-        ebook.id === id
-          ? {
-              ...ebook,
-              pdfDownloads: type === "pdf" ? ebook.pdfDownloads + 1 : ebook.pdfDownloads,
-              epubDownloads: type === "epub" ? ebook.epubDownloads + 1 : ebook.epubDownloads,
-            }
-          : ebook
-      );
-      persistEbookData(updated);
-      return updated;
-    });
+  const handleDownload = async (id: string, type: "pdf" | "epub") => {
+    try {
+      await incrementDownloadCount(id, type);
+      // Re-fetch to update download counts
+      fetchEbooks();
+    } catch (error) {
+      console.error("Download count update failed:", error);
+      toast({ title: "Failed to update download count", status: "error", duration: 3000 });
+    }
   };
 
-  const handleReviewChange = (id: string, field: "rating", value: number) => {
-    setReviewInputs((prev) => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        [field]: value,
-        comment: "",
-      },
-    }));
+  const handleReviewChange = (id: string, value: number) => {
+    setReviewInputs((prev) => ({ ...prev, [id]: { rating: value } }));
   };
 
-  const submitReview = (ebookId: string) => {
-    const { rating } = reviewInputs[ebookId] || {};
-    if (!rating) {
+  const handleSubmitReview = async (ebookId: string) => {
+    const input = reviewInputs[ebookId];
+    if (!input || !input.rating) {
       toast({ title: "Please select a rating", status: "warning", duration: 3000 });
       return;
     }
 
-    setEbooks((prev) => {
-      const updated = prev.map((ebook) =>
-        ebook.id === ebookId
-          ? {
-              ...ebook,
-              reviewCount: ebook.reviewCount + 1,
-              rating: Math.min(
-                5,
-                Math.round((ebook.rating * ebook.reviewCount + rating) / (ebook.reviewCount + 1))
-              ),
-            }
-          : ebook
-      );
-      persistEbookData(updated);
-      return updated;
-    });
+    try {
+      await submitRating(ebookId, input.rating);
+      toast({ title: "Thank you for your rating!", status: "success", duration: 3000 });
+      fetchEbooks();
+    } catch (err) {
+      console.error("Failed to submit rating", err);
+      toast({ title: "Rating submission failed", status: "error", duration: 3000 });
+    }
 
-    setReviewInputs((prev) => ({ ...prev, [ebookId]: { rating: 0, comment: "" } }));
-    toast({ title: "Thank you for your rating!", status: "success", duration: 3000 });
+    setReviewInputs((prev) => ({ ...prev, [ebookId]: { rating: 0 } }));
+    setIsModalOpen(false);
   };
-  
-  type EbookLocalData = {
-  [id: string]: {
-    pdfDownloads: number;
-    epubDownloads: number;
-    rating: number;
-    reviewCount: number;
-  };
-};
-  const persistEbookData = (updatedEbooks: EbookWithCounts[]) => {
-    const saveObj: EbookLocalData = {};
-    updatedEbooks.forEach((ebook) => {
-      saveObj[ebook.id] = {
-        pdfDownloads: ebook.pdfDownloads,
-        epubDownloads: ebook.epubDownloads,
-        rating: ebook.rating,
-        reviewCount: ebook.reviewCount,
-      };
-    });
-    saveLocalData(saveObj);
-  };
+
+  const analytics = ebooks.reduce(
+    (acc, ebook) => {
+      acc.totalBooks += 1;
+      acc.totalPages += ebook.page_count || 0;
+      acc.totalDownloads += (ebook.pdfDownloads || 0) + (ebook.epubDownloads || 0);
+      return acc;
+    },
+    { totalBooks: 0, totalPages: 0, totalDownloads: 0 }
+  );
 
   const gridCols = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4 });
 
@@ -197,6 +248,9 @@ const EbookPage = () => {
         </Container>
       </Box>
 
+      {/* Analytics cards section */}
+      <AnalyticsCards analytics={analytics} />
+
       <Container maxW="7xl" py={10}>
         <Flex justify="space-between" align="center" mb={6}>
           <Heading as="h2" size="lg" color={textColor}>
@@ -219,7 +273,7 @@ const EbookPage = () => {
         ) : (
           <SimpleGrid columns={gridCols} spacing={8}>
             {ebooks.map((ebook) => {
-              const totalDownloads = ebook.pdfDownloads + ebook.epubDownloads;
+              const totalDownloads = (ebook.pdfDownloads || 0) + (ebook.epubDownloads || 0);
               return (
                 <Box
                   key={ebook.id}
@@ -296,28 +350,28 @@ const EbookPage = () => {
 
                     <Flex align="center" gap={3} flexWrap="wrap" justifyContent="space-between" mt={2} mb={2}>
                       <Tooltip
-                        label={`${ebook.rating.toFixed(1)} average rating from ${ebook.reviewCount} reviews`}
+                        label={`${(ebook.rating || 0).toFixed(1)} average rating from ${ebook.reviewCount || 0} reviews`}
                         fontSize="sm"
                         openDelay={300}
                       >
                         <Flex
                           as="span"
                           role="img"
-                          aria-label={`Rating: ${ebook.rating.toFixed(1)} out of 5 from ${ebook.reviewCount} reviews`}
+                          aria-label={`Rating: ${(ebook.rating || 0).toFixed(1)} out of 5 from ${ebook.reviewCount || 0} reviews`}
                           align="center"
                           gap={1}
                         >
                           {[...Array(5)].map((_, i) => (
                             <Icon
                               key={i}
-                              as={i < Math.round(ebook.rating) ? FaStar : FaRegStar}
-                              color={i < Math.round(ebook.rating) ? "yellow.400" : "gray.300"}
+                              as={i < Math.round(ebook.rating || 0) ? FaStar : FaRegStar}
+                              color={i < Math.round(ebook.rating || 0) ? "yellow.400" : "gray.300"}
                               boxSize={5}
                               aria-hidden="true"
                             />
                           ))}
                           <Text fontSize="sm" color="gray.600" ml={1}>
-                            ({ebook.reviewCount})
+                            ({ebook.reviewCount || 0})
                           </Text>
                         </Flex>
                       </Tooltip>
@@ -343,9 +397,9 @@ const EbookPage = () => {
                           py={1}
                           borderRadius="md"
                           title="PDF downloads"
-                          aria-label={`${ebook.pdfDownloads} PDF downloads`}
+                          aria-label={`${ebook.pdfDownloads || 0} PDF downloads`}
                         >
-                          PDF: {ebook.pdfDownloads}
+                          PDF: {ebook.pdfDownloads || 0}
                         </Badge>
                         {ebook.epub_file && (
                           <Badge
@@ -356,9 +410,9 @@ const EbookPage = () => {
                             py={1}
                             borderRadius="md"
                             title="EPUB downloads"
-                            aria-label={`${ebook.epubDownloads} EPUB downloads`}
+                            aria-label={`${ebook.epubDownloads || 0} EPUB downloads`}
                           >
-                            EPUB: {ebook.epubDownloads}
+                            EPUB: {ebook.epubDownloads || 0}
                           </Badge>
                         )}
                       </Flex>
@@ -404,7 +458,7 @@ const EbookPage = () => {
                 id="rating-select"
                 value={selectedEbook ? reviewInputs[selectedEbook.id]?.rating || "" : ""}
                 onChange={(e) => {
-                  if (selectedEbook) handleReviewChange(selectedEbook.id, "rating", parseInt(e.target.value));
+                  if (selectedEbook) handleReviewChange(selectedEbook.id, parseInt(e.target.value));
                 }}
                 placeholder="Select rating"
               >
@@ -422,8 +476,7 @@ const EbookPage = () => {
               mr={3}
               onClick={() => {
                 if (selectedEbook) {
-                  submitReview(selectedEbook.id);
-                  setIsModalOpen(false);
+                  handleSubmitReview(selectedEbook.id);
                 }
               }}
               aria-label="Submit rating"

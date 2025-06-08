@@ -78,7 +78,11 @@ def get_all_ebooks():
             "pdf_file": url_for("static", filename=f"ebook/pdf/{e.pdf_file}", _external=True),
             "epub_file": url_for("static", filename=f"ebook/epub/{e.epub_file}", _external=True),
             "page_count": e.page_count,
-            "created_at": e.created_at.isoformat()
+            "created_at": e.created_at.isoformat(),
+            "pdf_downloads": e.pdf_downloads or 0,
+            "epub_downloads": e.epub_downloads or 0,
+            "rating": round(e.rating, 2) if e.rating else 0,
+            "review_count": e.review_count or 0
         } for e in ebooks
     ])
 
@@ -95,7 +99,11 @@ def get_ebook(ebook_id):
         "pdf_file": url_for("static", filename=f"ebook/pdf/{ebook.pdf_file}", _external=True),
         "epub_file": url_for("static", filename=f"ebook/epub/{ebook.epub_file}", _external=True),
         "page_count": ebook.page_count,
-        "created_at": ebook.created_at.isoformat()
+        "created_at": ebook.created_at.isoformat(),
+        "pdf_downloads": ebook.pdf_downloads or 0,
+        "epub_downloads": ebook.epub_downloads or 0,
+        "rating": round(ebook.rating, 2) if ebook.rating else 0,
+        "review_count": ebook.review_count or 0
     })
 
 @blp.route("/delete/<uuid:ebook_id>", methods=["DELETE"])
@@ -114,10 +122,9 @@ def delete_ebook(ebook_id):
     db.session.commit()
     return jsonify({"message": "Ebook deleted successfully"})
 
-@blp.route('/<int:ebook_id>/increment_download', methods=['POST'])
+@blp.route('/increment_download/<uuid:ebook_id>', methods=['POST'])
 def increment_download(ebook_id):
-    data = request.get_json()
-    download_type = data.get('type')
+    download_type = request.args.get('type')
 
     if download_type not in ['pdf', 'epub']:
         return jsonify({"error": "Invalid download type. Must be 'pdf' or 'epub'."}), 400
@@ -137,4 +144,40 @@ def increment_download(ebook_id):
         "message": f"{download_type.upper()} download count incremented",
         "pdf_downloads": ebook.pdf_downloads,
         "epub_downloads": ebook.epub_downloads
+    }), 200
+
+@blp.route('/submit_rating/<uuid:ebook_id>', methods=['POST'])
+def submit_rating(ebook_id):
+    data = request.get_json()
+    rating = data.get('rating')
+
+    if rating is None:
+        return jsonify({"error": "Rating is required"}), 400
+
+    try:
+        rating = int(rating)
+        if not (1 <= rating <= 5):
+            raise ValueError()
+    except ValueError:
+        return jsonify({"error": "Rating must be an integer between 1 and 5"}), 400
+
+    ebook = Ebook.query.get(ebook_id)
+    if not ebook:
+        return jsonify({"error": "Ebook not found"}), 404
+
+    # Calculate new average rating
+    ebook.review_count = ebook.review_count or 0
+    ebook.rating = ebook.rating or 0.0
+
+    current_total = float(ebook.rating) * ebook.review_count
+    ebook.review_count += 1
+    ebook.rating = (current_total + rating) / ebook.review_count
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Rating submitted successfully",
+        "ebook_id": str(ebook.id),
+        "rating": round(ebook.rating, 2),
+        "review_count": ebook.review_count
     }), 200

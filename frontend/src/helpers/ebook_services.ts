@@ -4,6 +4,8 @@ import {
   EbookPostData,
   EbookListResponse,
   EbookPostResponse,
+  SubmitRatingResponse,
+  RateEbookResponse,
 } from "./model";
 
 // ✅ Read base URL from .env
@@ -73,6 +75,34 @@ export const deleteEbook = async (
   return response.data;
 };
 
-export const incrementDownloadCount = async (id: string, type: "pdf" | "epub") => {
-  await axios.post(`/api/ebooks/${id}/increment_download`, { type });
+/**
+ * Increment PDF/EPUB download count
+ */
+export const incrementDownloadCount = async (
+  ebookId: string,
+  type: "pdf" | "epub"
+): Promise<void> => {
+  await axios.post(`${API_BASE}/increment_download/${ebookId}?type=${type}`);
+};
+
+/**
+ * Submit rating for an ebook
+ */
+export const submitRating = async (
+  ebookId: string,
+  rating: number
+): Promise<SubmitRatingResponse> => {
+  const response = await axios.post<SubmitRatingResponse>(
+    `${API_BASE}/submit_rating/${ebookId}`,
+    { rating }
+  );
+  return response.data;
+};
+
+export const rateEbook = async (
+  ebookId: string,
+  rating: number
+): Promise<RateEbookResponse> => {
+  const response = await axios.post(`${API_BASE}/${ebookId}/rate`, { rating });
+  return response.data;
 };

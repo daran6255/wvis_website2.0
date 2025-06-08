@@ -113,6 +113,7 @@ export interface BlogPostResponse {
 // ---------------------------------------
 // Ebook Interfaces
 // ---------------------------------------
+
 export interface Ebook {
   id: string;
   name: string;
@@ -122,9 +123,12 @@ export interface Ebook {
   epub_file: string;     // URL to EPUB
   page_count: number;
   created_at: string;
+  pdf_downloads?: number;
+  epub_downloads?: number;
+  rating?: number;
+  review_count?: number;
 }
 
-// FormData format for POST request
 export interface EbookPostData {
   name: string;
   description: string;
@@ -133,11 +137,21 @@ export interface EbookPostData {
   epub_file?: File;   // <-- Optional field
 }
 
-// Response from POST /api/ebooks/postebook
 export interface EbookPostResponse {
   message: string;
   ebook: Ebook;
 }
 
-// Response from GET /api/ebooks/getall
 export type EbookListResponse = Ebook[];
+
+export interface SubmitRatingResponse {
+  message: string;
+  ebook_id: string;
+  rating: number;
+}
+
+export interface RateEbookResponse {
+  message: string;
+  rating: number;
+  review_count: number;
+}
