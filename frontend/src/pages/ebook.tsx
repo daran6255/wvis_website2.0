@@ -3,7 +3,7 @@ import {
   Container,
   Heading,
   Text,
-  Image,
+  // Image,
   SimpleGrid,
   Button,
   useColorModeValue,
@@ -26,7 +26,7 @@ import {
   useBreakpointValue,
   Divider,
 } from "@chakra-ui/react";
-import { FaDownload, FaStar, FaRegStar, FaBook, FaFileAlt } from "react-icons/fa";
+import { FaDownload, FaStar, FaRegStar, FaBook, FaFileAlt,FaSyncAlt } from "react-icons/fa";
 import Navbar from "../components/common/Navbar";
 import Footer from "../components/common/Footer";
 import { useEffect, useState } from "react";
@@ -259,7 +259,7 @@ const EbookPage = () => {
           <Button
             onClick={fetchEbooks}
             colorScheme="teal"
-            leftIcon={<FaDownload />}
+            leftIcon={<FaSyncAlt />}
             aria-label="Refresh eBook list"
           >
             Refresh
@@ -282,18 +282,22 @@ const EbookPage = () => {
                   boxShadow="lg"
                   transition="all 0.3s"
                   _hover={{ transform: "scale(1.02)", boxShadow: "xl" }}
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="space-between"
+                  height="100%" // ensures grid items grow evenly
                   role="region"
                   aria-labelledby={`ebook-title-${ebook.id}`}
                 >
                   <Box position="relative">
-                    <Image
+                    {/* <Image
                       src={ebook.image_file}
                       alt={`Cover image of ${ebook.name}`}
                       w="100%"
                       h="180px"
                       objectFit="cover"
-                    />
-                    <Badge position="absolute" top={2} left={2} colorScheme="teal" aria-label="Free eBook">
+                    /> */}
+                    <Badge  top={2} left={2} mb={1} colorScheme="teal" aria-label="Free eBook">
                       Free
                     </Badge>
                     {totalDownloads > 100 && (
@@ -303,10 +307,10 @@ const EbookPage = () => {
                     )}
                   </Box>
 
-                  <VStack spacing={3} align="start" p={4}>
-                    <Heading as="h3" id={`ebook-title-${ebook.id}`} size="sm" color={textColor}>
-                      {ebook.name}
-                    </Heading>
+                  <VStack spacing={3} align="start" p={4} flex="1">
+                  <Heading as="h3" id={`ebook-title-${ebook.id}`} size="sm" color={textColor} noOfLines={1}>
+                    {ebook.name}
+                  </Heading>
                     <Text fontSize="sm" noOfLines={2} color="gray.600">
                       {ebook.description}
                     </Text>
