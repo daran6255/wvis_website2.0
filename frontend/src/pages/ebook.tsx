@@ -240,7 +240,7 @@ const EbookPage = () => {
             bgGradient="linear(to-r, teal.300, blue.500)"
             bgClip="text"
           >
-            Explore Our eBooks
+            Explore Our Accessible eBooks
           </Heading>
           <Text as="p" color="gray.200" fontSize={{ base: "md", md: "xl" }}>
             Discover inclusive knowledge, available in accessible formats.
@@ -254,7 +254,7 @@ const EbookPage = () => {
       <Container maxW="7xl" py={10}>
         <Flex justify="space-between" align="center" mb={6}>
           <Heading as="h2" size="lg" color={textColor}>
-            eBook Library
+          Accessible eBook Library
           </Heading>
           <Button
             onClick={fetchEbooks}
