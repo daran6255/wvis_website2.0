@@ -118,9 +118,9 @@ export interface Ebook {
   id: string;
   name: string;
   description: string;
-  image_file: string;
-  pdf_file: string;      // URL to PDF
-  epub_file: string;     // URL to EPUB
+  image_file: string;   // URL to image
+  pdf_file: string;     // URL to PDF
+  epub_file: string;    // URL to EPUB
   page_count: number;
   created_at: string;
   pdf_downloads?: number;
@@ -129,15 +129,30 @@ export interface Ebook {
   review_count?: number;
 }
 
+// Used for POST (create)
 export interface EbookPostData {
   name: string;
   description: string;
-  image_file?: File;  // <-- Allow undefined
-  pdf_file?: File;    // <-- Allow undefined
-  epub_file?: File;   // <-- Optional field
+  image_file: File;
+  pdf_file: File;
+  epub_file: File;
+}
+
+// Used for PUT (update, all fields optional)
+export interface EbookPutData {
+  name?: string;
+  description?: string;
+  image_file?: File;
+  pdf_file?: File;
+  epub_file?: File;
 }
 
 export interface EbookPostResponse {
+  message: string;
+  ebook: Ebook;
+}
+
+export interface EbookPutResponse {
   message: string;
   ebook: Ebook;
 }

@@ -2,8 +2,10 @@ import axios from "axios";
 import {
   Ebook,
   EbookPostData,
+  EbookPutData,
   EbookListResponse,
   EbookPostResponse,
+  EbookPutResponse,
   SubmitRatingResponse,
   RateEbookResponse,
 } from "./model";
@@ -52,6 +54,34 @@ export const postEbook = async (
 
   const response = await axios.post<EbookPostResponse>(
     `${API_BASE}/upload`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};
+
+/**
+ * Update an existing ebook (PUT with FormData for optional file updates)
+ */
+export const putEbook = async (
+  ebookId: string,
+  data: EbookPutData
+): Promise<EbookPutResponse> => {
+  const formData = new FormData();
+
+  if (data.name) formData.append("name", data.name);
+  if (data.description) formData.append("description", data.description);
+  if (data.image_file) formData.append("image_file", data.image_file);
+  if (data.pdf_file) formData.append("pdf_file", data.pdf_file);
+  if (data.epub_file) formData.append("epub_file", data.epub_file);
+
+  const response = await axios.put<EbookPutResponse>(
+    `${API_BASE}/update/${ebookId}`,
     formData,
     {
       headers: {
