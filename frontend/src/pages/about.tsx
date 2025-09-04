@@ -82,7 +82,7 @@ export default function About() {
           <Flex direction={{ base: 'column', md: 'row' }} align="center" gap={12}>
             <Box flex={1} animation={`${fadeInUp} 1s ease-out`}>
               <Image
-                src="/assets/teams/Shiva.jpg"
+                src="/assets/teams/Shiva.jpeg"
                 alt="Portrait of our founder"
                 rounded="2xl"
                 boxShadow="2xl"
