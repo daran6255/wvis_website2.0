@@ -1,5 +1,4 @@
 import Navbar from '../components/common/Navbar';
-import HeroSection from '../components/Home/HeroSection';
 import Testimonials from '../components/Home/Testimonial'
 import Footer from '../components/common/Footer';
 import ITServicesSection from '../components/Home/ITServicesSection';
@@ -11,12 +10,13 @@ import Product from '../components/Home/Product';
 import DEI from '../components/Home/DEI';
 // import Blog from '../components/Home/Blog';
 import SecHeroSection from '../components/Home/SecHeroSection';
+import Hero from '../components/Home/Hero';
 
 const Home = () => {
     return (
         <>
             <Navbar />
-            <HeroSection />
+            <Hero />
             <SecHeroSection />
             <ITServicesSection />
             <DEI />
@@ -25,8 +25,7 @@ const Home = () => {
             <Details /> 
             <Product />
             <Team />
-            <Testimonials />    
-            {/* <Blog /> */}
+            <Testimonials />
             <Footer />
         </>
     );

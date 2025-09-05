@@ -5,43 +5,14 @@ import {
   Heading,
   Image,
   Text,
-  useBreakpointValue,
 } from "@chakra-ui/react";
-import { keyframes } from "@emotion/react";
 import { motion } from "framer-motion";
-import "animate.css";
-
-const coinFlip = keyframes`
-  0% { transform: rotateY(0deg); }
-  50% { transform: rotateY(180deg); }
-  100% { transform: rotateY(360deg); }
-`;
 
 const MotionHeading = motion(Heading);
 const MotionText = motion(Text);
 const MotionButton = motion(Button);
 
 const HeroSection = () => {
-  const isMobile = useBreakpointValue({ base: true, md: false });
-
-  const coinCircles = [
-    { top: "10%", left: "5%", size: "30px", bg: "green.200", dur: "6s", opacity: 0.6 },
-    { bottom: "15%", right: "8%", size: "20px", bg: "blue.200", dur: "8s", opacity: 0.5 },
-    { top: "25%", right: "20%", size: "15px", bg: "purple.200", dur: "5s", opacity: 0.4 },
-    { bottom: "30%", left: "15%", size: "25px", bg: "yellow.200", dur: "7s", opacity: 0.5 },
-    { top: "40%", left: "70%", size: "18px", bg: "pink.200", dur: "9s", opacity: 0.5 },
-    { top: "10%", right: "15%", size: "25px", bg: "orange.200", dur: "6s", opacity: 0.5 },
-    { bottom: "10%", right: "10%", size: "30px", bg: "teal.200", dur: "7s", opacity: 0.6 },
-    { top: "50%", right: "5%", size: "22px", bg: "red.200", dur: "5s", opacity: 0.4 },
-    { top: "5%", left: "10%", size: "22px", bg: "cyan.200", dur: "5s", opacity: 0.5 },
-    { top: "45%", left: "8%", size: "18px", bg: "pink.300", dur: "6s", opacity: 0.4 },
-    { bottom: "15%", left: "5%", size: "28px", bg: "purple.100", dur: "7s", opacity: 0.6 },
-    { bottom: "5%", left: "20%", size: "20px", bg: "blue.100", dur: "8s", opacity: 0.5 },
-    { top: "20%", left: "12%", size: "24px", bg: "orange.100", dur: "6s", opacity: 0.5 },
-    { top: "60%", left: "10%", size: "20px", bg: "teal.100", dur: "7s", opacity: 0.4 },
-    { bottom: "20%", right: "20%", size: "26px", bg: "cyan.100", dur: "6s", opacity: 0.5 },
-    { top: "35%", right: "10%", size: "18px", bg: "yellow.100", dur: "5s", opacity: 0.5 },
-  ];
 
   return (
     <>
@@ -58,26 +29,6 @@ const HeroSection = () => {
         py={{ base: 6, md: 12 }}
         style={{ perspective: "1000px" }}
       >
-        {/* Background Coins - Decorative Only */}
-        {(isMobile ? coinCircles.slice(0, 5) : coinCircles).map((circle, i) => (
-          <Box
-            key={i}
-            position="absolute"
-            top={circle.top}
-            bottom={circle.bottom}
-            left={circle.left}
-            right={circle.right}
-            w={circle.size}
-            h={circle.size}
-            borderRadius="full"
-            bg={circle.bg}
-            animation={`${coinFlip} ${circle.dur} linear infinite`}
-            zIndex={0}
-            opacity={circle.opacity}
-            aria-hidden="true"
-            role="presentation"
-          />
-        ))}
 
         {/* Main Hero Content */}
         <Flex
