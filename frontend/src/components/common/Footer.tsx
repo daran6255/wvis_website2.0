@@ -8,7 +8,7 @@ import {
   VisuallyHidden,
   Flex,
 } from '@chakra-ui/react'
-import { FaInstagram, FaTwitter, FaYoutube, FaFacebook } from 'react-icons/fa'
+import { FaInstagram, FaTwitter, FaYoutube, FaFacebook, FaLinkedin } from 'react-icons/fa'
 import { ReactNode } from 'react'
 
 const SocialButton = ({
@@ -62,17 +62,20 @@ export default function SmallWithSocial() {
           <Stack spacing={6}>
             <Flex justify="center">
               <Stack direction="row" spacing={6}>
-                <SocialButton label="Twitter X" href="https://twitter.com">
+                <SocialButton label="Twitter X" href="https://x.com/WinVinaya">
                   <FaTwitter />
                 </SocialButton>
-                <SocialButton label="YouTube" href="https://youtube.com">
+                <SocialButton label="YouTube" href="https://youtube.com/@winvinayainfosystems4304?si=NyJKzdefAbyaYZyd">
                   <FaYoutube />
                 </SocialButton>
-                <SocialButton label="Instagram" href="https://instagram.com">
+                <SocialButton label="Instagram" href="https://www.instagram.com/winvinayainfosystems/">
                   <FaInstagram />
                 </SocialButton>
-                <SocialButton label="Facebook" href="https://facebook.com">
+                <SocialButton label="Facebook" href="https://www.facebook.com/WinVinaya/">
                   <FaFacebook />
+                </SocialButton>
+                <SocialButton label="LinkedIn" href="https://www.linkedin.com/company/3485570/admin/dashboard/">
+                  <FaLinkedin />
                 </SocialButton>
               </Stack>
             </Flex>
