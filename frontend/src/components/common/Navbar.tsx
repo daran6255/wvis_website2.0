@@ -42,31 +42,31 @@ const Navbar = () => {
   const socialLinks = [
     {
       label: 'LinkedIn',
-      href: 'https://www.linkedin.com',
+      href: 'https://www.linkedin.com/company/3485570/admin/dashboard/',
       icon: FaLinkedin,
       color: '#0A66C2',
     },
     {
       label: 'Twitter X',
-      href: 'https://twitter.com',
+      href: 'https://x.com/WinVinaya',
       icon: FaTwitter,
       color: '#1DA1F2',
     },
     {
       label: 'Instagram',
-      href: 'https://www.instagram.com',
+      href: 'https://www.instagram.com/winvinayainfosystems/',
       icon: FaInstagram,
       color: '#E1306C',
     },
     {
       label: 'Facebook',
-      href: 'https://www.facebook.com',
+      href: 'https://www.facebook.com/WinVinaya/',
       icon: FaFacebook,
       color: '#1877F2',
     },
     {
       label: 'YouTube',
-      href: 'https://www.youtube.com',
+      href: 'https://youtube.com/@winvinayainfosystems4304?si=NyJKzdefAbyaYZyd ',
       icon: FaYoutube,
       color: '#FF0000',
     },
