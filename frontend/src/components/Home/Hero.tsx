@@ -16,7 +16,7 @@ export default function Hero() {
       as="section"
       position="relative"
       bg="white"
-      minH="900px"
+      minH={{ base: "1000px", md: "750px", lg: "800px" }}
       display="flex"
       alignItems="center"
       justifyContent="center"
@@ -57,12 +57,12 @@ export default function Hero() {
           </Heading>
           <TyperComponent
             strings={[
-              "AI-Powered Solutions",
-              "Enterprise-Grade IT Consulting",
-              "Compliance & Accessibility Services",
-              "Digital Transformation Strategies",
-              "Custom Software Development",
-              "Cloud & Infrastructure Solutions",
+              "AI Solutions",
+              "IT Consulting",
+              "Accessibility & Compliance",
+              "Digital Transformation",
+              "Custom Software",
+              "Cloud Solutions",
             ]}
           />
 
